@@ -16,14 +16,15 @@ class AdvertiserTest extends WordSpec with Matchers {
 
   "The advertiser" should {
     "return empty string after max number of retry" in {
-      val res: String = fakeAdvertiser.sendRequest(timeoutInMillis = 10000)
+      val res: String =
+        fakeAdvertiser1.sendRequest(timeoutInMillis = 10000)
       res should equal("")
     }
   }
 
   "The advertiser" should {
     "return empty string after timeout" in {
-      val res: String = fakeAdvertiser.sendRequest(timeoutInMillis = 1)
+      val res: String = fakeAdvertiser1.sendRequest(timeoutInMillis = 10)
       res should equal("")
     }
   }
@@ -47,23 +48,24 @@ class AdvertiserTest extends WordSpec with Matchers {
   """.stripMargin
 }
 
-class FakeAdvertiser(val id: String, val name: String, val url: String)(
-    implicit val rs: RetryStrategy,
-    val ec: ExecutionContext)
+class FakeAdvertiser(val id: String,
+                     val name: String,
+                     val url: String,
+                     val categories: Seq[String],
+                     val prices: Seq[Double])(implicit val rs: RetryStrategy,
+                                              val ec: ExecutionContext)
     extends Advertiser {
 
-  val categories = Seq("game", "sport", "casino")
-  val prices = Seq(2.5, 1.5, 3.0, 2.0, 6.0, 4.5, 1.0)
-
   override protected def parse(body: String): Seq[Ad] = {
-    for (i <- 1 to 10) yield {
-      Ad(
-        adId = UUID.randomUUID().toString,
-        url = new URL("http://www." + name + ".com/" + i),
-        price = RandomGenericCreators.randomElem(prices),
-        category = RandomGenericCreators.randomElem(categories)
-      )
-    }
+//    for (i <- 1 to 10) yield {
+//      Ad(
+//        adId = UUID.randomUUID().toString,
+//        url = new URL("http://www." + name + ".com/" + i),
+//        price = RandomGenericCreators.randomElem(prices),
+//        category = RandomGenericCreators.randomElem(categories)
+//      )
+//    }
+    Seq.empty
   }
 }
 
@@ -75,8 +77,19 @@ object TestData {
   implicit val retryStrategy: RetryStrategy =
     RetryStrategy.fixedBackOff(retryDuration = 1.second, maxAttempts = 3)
 
-  val fakeAdvertiser =
-    new FakeAdvertiser(id = "123",
-                       name = "abc",
-                       url = "http://www.abc.com/non-exist-path")
+  val fakeAdvertiser1 = new FakeAdvertiser(
+    id = "123",
+    name = "abc",
+    url = "http://www.abc.com/non-exist-path",
+    categories = Seq("game", "sport", "casino"),
+    prices = Seq(2.5, 1.5, 3.0, 2.0, 6.0, 4.5, 1.0)
+  )
+
+  val fakeAdvertiser2 = new FakeAdvertiser(
+    id = "789",
+    name = "xyz",
+    url = "http://www.xyz.com/non-exist-path",
+    categories = Seq("game", "sport", "casino", "food"),
+    prices = Seq(6.2, 1.2, 5.2, 9.2, 3.2)
+  )
 }
