@@ -14,8 +14,6 @@ trait HttpClient[T] {
   def httpPost(url: URL, payload: String, timeoutInMillis: Long)(implicit ec: ExecutionContext): T
 }
 
-// use object or class?
-// should each service have its own http client?
 object ScalaHttpClient extends HttpClient[String] {
   @throws(classOf[java.io.IOException])
   override def httpGet(url: URL, timeoutInMillis: Long)(implicit ec: ExecutionContext) : String = {

@@ -18,6 +18,7 @@ object AdgetService {
           left.price > right.price
         }.head
       }
+//    following is equivalent
 //      .map { elem: (String, Seq[Ad]) =>
 //        elem._1 -> elem._2.sortWith { (left: Ad, right: Ad) =>
 //          left.price > right.price
