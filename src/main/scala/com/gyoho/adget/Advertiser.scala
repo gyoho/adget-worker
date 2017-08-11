@@ -1,14 +1,15 @@
 package com.gyoho.adget
 
 import java.net.URL
+import java.util.concurrent.TimeoutException
 
-import com.gyoho.adget.utils.{HttpClient, ScalaHttpClient}
+import com.gyoho.adget.utils.HttpClient
 import com.typesafe.scalalogging.LazyLogging
+import util.retry.blocking.{Retry, RetryStrategy, Failure => RetryFailure, Success => RetrySuccess}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
-import util.retry.blocking.{Retry, RetryStrategy, Failure => RetryFailure, Success => RetrySuccess}
 
 trait Advertiser extends LazyLogging {
   def id: String
@@ -27,8 +28,13 @@ trait Advertiser extends LazyLogging {
     Try(Await.result(responseFuture, timeoutInMillis.millisecond)) match {
       case Success(res) => res match {
         case RetrySuccess(data) => Success(data.toString)
-        case RetryFailure(ex) => Failure(ex)
+        case RetryFailure(ex) =>
+          logger.info("Max retry reached")
+          Failure(ex)
       }
+      case Failure(ex: TimeoutException) =>
+        logger.info("Request timeout")
+        Failure(ex)
       case Failure(ex) => Failure(ex)
     }
   }
@@ -46,7 +52,7 @@ trait Advertiser extends LazyLogging {
     val resToParse = response match {
       case Success(res) => res
       case Failure(ex) =>
-        logger.info(s"Failed to get ads from advertiser=$name. Request timeout. ex=${ex.getMessage}")
+        logger.info(s"Failed to get ads from advertiser=$name. ${ex.toString}")
         ""
     }
 

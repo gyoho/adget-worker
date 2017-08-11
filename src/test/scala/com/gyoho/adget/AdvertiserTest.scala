@@ -68,38 +68,40 @@ class FakeAdvertiser(val id: String,
     extends Advertiser {
 
   override protected def parse(body: String): Seq[Ad] = {
-//    for (i <- 1 to 10) yield {
-//      Ad(
-//        adId = UUID.randomUUID().toString,
-//        url = new URL("http://www." + name + ".com/" + i),
-//        price = RandomGenericCreators.randomElem(prices),
-//        category = RandomGenericCreators.randomElem(categories)
-//      )
-//    }
-    Seq.empty
+    for (i <- 1 to 10) yield {
+      Ad(
+        adId = UUID.randomUUID().toString,
+        url = new URL("http://www." + name + ".com/" + i),
+        price = RandomGenericCreators.randomElem(prices),
+        category = RandomGenericCreators.randomElem(categories)
+      )
+    }
   }
 }
 
 object TestData {
-  val NUM_OF_THREAD = 5
+  val NUM_OF_THREAD = 30
+  val MAX_RETRY_ATTEMPTS = 2
+  val RETRY_DURATION_IN_MILLIS = 20
+
   val ex: ExecutorService = Executors.newFixedThreadPool(NUM_OF_THREAD)
   implicit val ec: ExecutionContext = ExecutionContext.fromExecutorService(ex)
 
   implicit val retryStrategy: RetryStrategy =
-    RetryStrategy.fixedBackOff(retryDuration = 20.millisecond, maxAttempts = 3)
+    RetryStrategy.fixedBackOff(retryDuration = RETRY_DURATION_IN_MILLIS.millisecond, maxAttempts = MAX_RETRY_ATTEMPTS)
 
   val fakeAdvertiser1 = new FakeAdvertiser(
     id = "123",
     name = "abc",
-    url = "http://www.abc.com/non-exist-path",
+    url = "http://www.abc123.com/non-exist-path",
     categories = Seq("game", "sport", "casino"),
     prices = Seq(2.5, 1.5, 3.0, 2.0, 6.0, 4.5, 1.0)
   )
 
   val fakeAdvertiser2 = new FakeAdvertiser(
-    id = "789",
+    id = "8910",
     name = "xyz",
-    url = "http://www.xyz.com/non-exist-path",
+    url = "http://www.xyz8910.com/non-exist-path",
     categories = Seq("game", "sport", "casino", "food"),
     prices = Seq(6.2, 1.2, 5.2, 9.2, 3.2)
   )
