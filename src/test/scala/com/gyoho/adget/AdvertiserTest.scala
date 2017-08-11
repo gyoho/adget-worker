@@ -2,30 +2,41 @@ package com.gyoho.adget
 
 import java.net.URL
 import java.util.UUID
-import java.util.concurrent.{ExecutorService, Executors}
+import java.util.concurrent.{ExecutorService, Executors, TimeoutException}
 
-import com.gyoho.adget.utils.RandomGenericCreators
+import com.gyoho.adget.utils.{RandomGenericCreators, ScalaHttpClient}
 import org.scalatest.{Matchers, WordSpec}
 import util.retry.blocking.RetryStrategy
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
+import scala.util.{Failure, Success, Try}
 
 class AdvertiserTest extends WordSpec with Matchers {
   import TestData._
 
   "The advertiser" should {
     "return empty string after max number of retry" in {
-      val res: String =
-        fakeAdvertiser1.sendRequest(timeoutInMillis = 10000)
-      res should equal("")
+      val res: Try[String] =
+        fakeAdvertiser1.sendRequest(ScalaHttpClient, timeoutInMillis = 10000)
+
+      res match {
+        case Failure(_: TimeoutException) => fail("request failed with different reason")
+        case Failure(_) => // expected to be this case
+        case Success(_) => fail("this request is expected to fail")
+      }
     }
   }
 
   "The advertiser" should {
     "return empty string after timeout" in {
-      val res: String = fakeAdvertiser1.sendRequest(timeoutInMillis = 10)
-      res should equal("")
+      val res: Try[String] = fakeAdvertiser1.sendRequest(ScalaHttpClient, timeoutInMillis = 10)
+
+      res match {
+        case Failure(_: TimeoutException) => // expected to be this case
+        case Failure(_) => fail("request failed with different reason")
+        case Success(_) => fail("this request is expected to fail")
+      }
     }
   }
 
@@ -75,7 +86,7 @@ object TestData {
   implicit val ec: ExecutionContext = ExecutionContext.fromExecutorService(ex)
 
   implicit val retryStrategy: RetryStrategy =
-    RetryStrategy.fixedBackOff(retryDuration = 1.second, maxAttempts = 3)
+    RetryStrategy.fixedBackOff(retryDuration = 20.millisecond, maxAttempts = 3)
 
   val fakeAdvertiser1 = new FakeAdvertiser(
     id = "123",

@@ -2,7 +2,7 @@ package com.gyoho.adget
 
 import java.net.URL
 
-import com.gyoho.adget.utils.ScalaHttpClient
+import com.gyoho.adget.utils.{HttpClient, ScalaHttpClient}
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.duration._
@@ -16,16 +16,17 @@ trait Advertiser extends LazyLogging {
   def name: String
   implicit def rs: RetryStrategy
   implicit def ec: ExecutionContext
-  val TIMEOUT_IN_MILLIS = 5000
 
-  def sendRequest(timeoutInMillis: Long): Try[String] = {
-    val responseFuture: Future[Retry[String]] = Future {
-      Retry(ScalaHttpClient.httpGet(new URL(url)))
+  val TIMEOUT_IN_MILLIS = 200
+
+  def sendRequest[T](client: HttpClient[T], timeoutInMillis: Long): Try[String] = {
+    val responseFuture = Future {
+      Retry(client.httpGet(new URL(url), timeoutInMillis / 2))
     }
 
     Try(Await.result(responseFuture, timeoutInMillis.millisecond)) match {
       case Success(res) => res match {
-        case RetrySuccess(data) => Success(data)
+        case RetrySuccess(data) => Success(data.toString)
         case RetryFailure(ex) => Failure(ex)
       }
       case Failure(ex) => Failure(ex)
@@ -34,22 +35,22 @@ trait Advertiser extends LazyLogging {
 
   protected def parse(body: String): Seq[Ad]
 
-  def getAds(timeoutInMillis: Long = TIMEOUT_IN_MILLIS): Seq[Ad] = {
+  def getAds[T](client: HttpClient[T], timeoutInMillis: Long = TIMEOUT_IN_MILLIS): Seq[Ad] = {
     logger.info(s"timeout = $timeoutInMillis milliseconds")
     val currentTime = System.currentTimeMillis()
 
-    val response = sendRequest(timeoutInMillis)
+    val response = sendRequest(client, timeoutInMillis)
 
     logger.info(s"took ${System.currentTimeMillis() - currentTime} milliseconds")
 
-    val resToparse = response match {
+    val resToParse = response match {
       case Success(res) => res
       case Failure(ex) =>
         logger.info(s"Failed to get ads from advertiser=$name. Request timeout. ex=${ex.getMessage}")
         ""
     }
 
-    parse(resToparse)
+    parse(resToParse)
   }
 }
 

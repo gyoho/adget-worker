@@ -9,7 +9,7 @@ class AdgetServiceTest extends WordSpec with Matchers {
 
   "The adget servie" should {
     "return map of category to max price of ad" in {
-      val res: Map[String, Ad] = AdgetService.getNewAdMap(advtz, 1000)
+      val res: Map[String, Ad] = AdgetService.getNewAdMap(advtz, 2000000)
       val uniqueCategory = advtz.flatMap(_.categories).toSet
       val uniquePrice = advtz.flatMap(_.prices).toSet
 

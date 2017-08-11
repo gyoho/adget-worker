@@ -1,5 +1,7 @@
 package com.gyoho.adget
 
+import com.gyoho.adget.utils.ScalaHttpClient
+
 object AdgetService {
   @volatile private var ads: Map[String, Ad] = Map.empty
 
@@ -9,7 +11,7 @@ object AdgetService {
 
   private[adget] def getNewAdMap(advertisers: Seq[Advertiser], timeoutInMillis: Long): Map[String, Ad] = {
     advertisers
-      .flatMap(_.getAds(timeoutInMillis = timeoutInMillis))
+      .flatMap(_.getAds(ScalaHttpClient, timeoutInMillis = timeoutInMillis))
       .groupBy(_.category)
       .mapValues { ads: Seq[Ad] =>
         ads.sortWith { (left: Ad, right: Ad) =>
