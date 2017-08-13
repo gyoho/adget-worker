@@ -4,15 +4,21 @@ version := "1.0"
 
 scalaVersion := "2.12.3"
 
-val jacksonVersion = "2.9.0"
 
-val jacksonAnnotations = "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion
-val jacksonCore = "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion
-val jacksonDatabind = "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion
-val jacksonDatatypeJoda = "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % jacksonVersion
-val jacksonModuleScala = "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion
-val jacksonJaxrsBase = "com.fasterxml.jackson.jaxrs" % "jackson-jaxrs-base" % jacksonVersion
-val jacksonJaxrsJsonProvider = "com.fasterxml.jackson.jaxrs" % "jackson-jaxrs-json-provider" % jacksonVersion
+val circeVersion = "0.8.0"
+
+libraryDependencies ++= Seq(
+  "io.circe" %% "circe-core",
+  "io.circe" %% "circe-generic",
+  "io.circe" %% "circe-parser",
+  "io.circe" %% "circe-generic-extras"
+).map(_ % circeVersion)
+
+
+// Add Macro Paradise compiler plugin to use @JsonCodec the macro annotation
+addCompilerPlugin(
+  "org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full
+)
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",

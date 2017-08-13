@@ -19,3 +19,4 @@ gen### Example user template template
 out
 gen
 .DS_Store
+scratch/
