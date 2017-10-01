@@ -6,6 +6,15 @@
 3. Advertisers update their ads inventory regulary
 4. Ad server needs adopt this update too
 
+```
+Ad
+ |-- adId: String
+ |-- category: String
+ |-- price: Double
+ |-- url: URL
+```
+
+
 ## TODO
  - Don't do batch update and wait until all advertiser returns or timeout
  - Some advertiser update its inventory frequently and some don't
