@@ -16,6 +16,7 @@ Ad
 
 
 ## TODO
+ - `Await.result` blocks the caller thread, and the caller thread just sits there and doing nothing --> **Avoid**
  - Don't do batch update and wait until all advertiser returns or timeout
  - Some advertiser update its inventory frequently and some don't
  - Update individually with timeout and retry if an advertiser timeouts
