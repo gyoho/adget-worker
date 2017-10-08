@@ -16,7 +16,7 @@ Ad
 
 
 ## TODO
- - `Future.sequence(Seq(...))` returns Future(Failure(...)) if even ```diff -one``` of the computation fails
+ - `Future.sequence(Seq(...))` returns Future(Failure(...)) if even _one_ of the computation fails
  - `Await.result` blocks the caller thread, and the caller thread just sits there and doing nothing --> **Avoid**
  - Don't do batch update and wait until all advertiser returns or timeout
  - Some advertiser update its inventory frequently and some don't
