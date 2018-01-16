@@ -21,4 +21,7 @@ Ad
  - Don't do batch update and wait until all advertiser returns or timeout
  - Some advertiser update its inventory frequently and some don't
  - Update individually with timeout and retry if an advertiser timeouts
+ - Update the map periodically (**Akka Scheduler**)
+ - Use **Actor Model** to handle an internal state
+ - Instead of periodical update, stream the update from the clients (**Akka Stream**)
  
