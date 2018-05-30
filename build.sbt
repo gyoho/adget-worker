@@ -1,4 +1,4 @@
-name := "adget"
+name := "adget-worker"
 
 version := "1.0"
 
