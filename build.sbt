@@ -1,18 +1,18 @@
-name := "adget"
+name := "adget-worker"
 
 version := "1.0"
 
 scalaVersion := "2.12.3"
 
-val jacksonVersion = "2.9.0"
 
-val jacksonAnnotations = "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion
-val jacksonCore = "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion
-val jacksonDatabind = "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion
-val jacksonDatatypeJoda = "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % jacksonVersion
-val jacksonModuleScala = "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion
-val jacksonJaxrsBase = "com.fasterxml.jackson.jaxrs" % "jackson-jaxrs-base" % jacksonVersion
-val jacksonJaxrsJsonProvider = "com.fasterxml.jackson.jaxrs" % "jackson-jaxrs-json-provider" % jacksonVersion
+val circeVersion = "0.8.0"
+
+libraryDependencies ++= Seq(
+  "io.circe" %% "circe-core",
+  "io.circe" %% "circe-generic",
+  "io.circe" %% "circe-parser"
+).map(_ % circeVersion)
+
 
 libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
@@ -21,5 +21,6 @@ libraryDependencies ++= Seq(
   "com.twitter" %% "finagle-http" % "6.44.0",
   "ch.qos.logback" % "logback-classic" % "1.2.3",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
-  "com.github.hipjim" % "scala-retry_2.12" % "0.2.2"
+  "com.github.hipjim" % "scala-retry_2.12" % "0.2.2",
+  "io.circe" % "circe-derivation_sjs0.6_2.11" % "0.8.0-M2"
 )
